@@ -14,6 +14,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
+-webkit-tap-highlight-color: transparent; /* removes ugly tap highlight */
 }
 
 body{
@@ -24,6 +25,7 @@ justify-content:center;
 font-family:'Inter',sans-serif;
 background:#0f1115;
 overflow:hidden;
+touch-action: manipulation; /* IMPORTANT mobile fix */
 }
 
 /* subtle romantic glow */
@@ -93,7 +95,7 @@ line-height:1.6;
 
 .btn-wrap{
 position:relative;
-height:190px;
+height:220px; /* slightly bigger for mobile escape */
 }
 
 
@@ -147,7 +149,7 @@ background:rgba(255,255,255,0.05);
 
 <div class="card">
 
-<h1>Will you be my Valentine PRAKHI ? ❤️</h1>
+<h1>Will you be my Valentine PRAKHI? ❤️</h1>
 
 <p>
 Every day with you already feels special,<br>
@@ -185,21 +187,33 @@ e.clientX-(rect.left+rect.width/2),
 e.clientY-(rect.top+rect.height/2)
 );
 
-if(dist<130){
+if(dist<150){
 move();
 cooldown=true;
-setTimeout(()=>cooldown=false,160);
+setTimeout(()=>cooldown=false,140);
 }
 
 });
 
 
-/* MOBILE ESCAPE */
+/* 🔥 ADVANCED MOBILE ESCAPE — DOES NOT BLOCK CLICKS */
 
-no.addEventListener("touchstart",(e)=>{
-e.preventDefault();
+document.addEventListener("touchmove",(e)=>{
+
+const touch=e.touches[0];
+const rect=no.getBoundingClientRect();
+
+const dist=Math.hypot(
+touch.clientX-(rect.left+rect.width/2),
+touch.clientY-(rect.top+rect.height/2)
+);
+
+if(dist<170){
 move();
-});
+}
+
+},{passive:true}); // critical for performance + click safety
+
 
 
 function move(){
@@ -217,13 +231,14 @@ x=Math.random()*maxX;
 y=Math.random()*maxY;
 }
 while(
-Math.abs(x-no.offsetLeft)<90 &&
-Math.abs(y-no.offsetTop)<60
+Math.abs(x-no.offsetLeft)<130 &&
+Math.abs(y-no.offsetTop)<90
 );
 
 no.style.left=x+"px";
 no.style.top=y+"px";
 }
+
 
 
 /* SUCCESS SCREEN */
@@ -252,7 +267,7 @@ You just made me the happiest person ❤️
 
 <p style="color:#aab1c3;font-size:22px;max-width:600px;">
 I promise to make this Valentine’s unforgettable.<br>
-Now I officially owe you a beautiful date.
+Now I officially owe you a beautiful date 🙂
 </p>
 
 </div>
