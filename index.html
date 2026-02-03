@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>For You ❤️</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+}
+
+body{
+min-height:100svh;
+display:flex;
+align-items:center;
+justify-content:center;
+font-family:'Inter',sans-serif;
+background:#0f1115;
+overflow:hidden;
+}
+
+/* subtle romantic glow */
+
+body::before{
+content:"";
+position:absolute;
+width:700px;
+height:700px;
+background:radial-gradient(circle, rgba(255,120,140,0.10), transparent 60%);
+top:-250px;
+right:-250px;
+}
+
+body::after{
+content:"";
+position:absolute;
+width:600px;
+height:600px;
+background:radial-gradient(circle, rgba(120,160,255,0.08), transparent 60%);
+bottom:-250px;
+left:-250px;
+}
+
+
+/* CARD */
+
+.card{
+width:min(820px,92vw);
+padding:70px 55px;
+border-radius:26px;
+
+background:rgba(255,255,255,0.04);
+backdrop-filter:blur(18px);
+-webkit-backdrop-filter:blur(18px);
+
+border:1px solid rgba(255,120,140,0.18);
+
+box-shadow:
+0 10px 40px rgba(0,0,0,0.6),
+inset 0 1px rgba(255,255,255,0.05);
+
+text-align:center;
+position:relative;
+}
+
+
+/* TYPOGRAPHY */
+
+h1{
+color:#e6e9ef;
+font-size:clamp(30px,4vw,46px);
+font-weight:600;
+letter-spacing:-0.4px;
+margin-bottom:14px;
+}
+
+p{
+color:#aab1c3;
+font-size:clamp(16px,2vw,20px);
+margin-bottom:45px;
+line-height:1.6;
+}
+
+
+/* BUTTON AREA */
+
+.btn-wrap{
+position:relative;
+height:190px;
+}
+
+
+/* BUTTONS */
+
+button{
+padding:14px 30px;
+font-size:17px;
+border-radius:12px;
+border:none;
+cursor:pointer;
+transition:.25s ease;
+}
+
+
+/* YES */
+
+#yes{
+background:#ffffff;
+color:#111;
+font-weight:600;
+box-shadow:0 6px 20px rgba(255,255,255,0.15);
+}
+
+#yes:hover{
+transform:translateY(-2px);
+}
+
+
+/* NO */
+
+#no{
+position:absolute;
+left:60%;
+top:40%;
+
+background:transparent;
+color:#c2c9d6;
+
+border:1px solid rgba(255,255,255,0.15);
+}
+
+#no:hover{
+background:rgba(255,255,255,0.05);
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>Will you be my Valentine PRAKHI ? ❤️</h1>
+
+<p>
+Every day with you already feels special,<br>
+but I was hoping to make this Valentine’s ours.<br><br>
+
+So… will you be mine?
+</p>
+
+<div class="btn-wrap" id="wrap">
+<button id="yes" onclick="accepted()">Yes, of course ❤️</button>
+<button id="no">I need time 🙈</button>
+</div>
+
+</div>
+
+<script>
+
+const no = document.getElementById("no");
+const wrap = document.getElementById("wrap");
+
+let cooldown=false;
+
+
+/* DESKTOP ESCAPE */
+
+document.addEventListener("mousemove",(e)=>{
+
+if(window.matchMedia("(pointer:coarse)").matches) return;
+if(cooldown) return;
+
+const rect=no.getBoundingClientRect();
+
+const dist=Math.hypot(
+e.clientX-(rect.left+rect.width/2),
+e.clientY-(rect.top+rect.height/2)
+);
+
+if(dist<130){
+move();
+cooldown=true;
+setTimeout(()=>cooldown=false,160);
+}
+
+});
+
+
+/* MOBILE ESCAPE */
+
+no.addEventListener("touchstart",(e)=>{
+e.preventDefault();
+move();
+});
+
+
+function move(){
+
+const btnW=no.offsetWidth;
+const btnH=no.offsetHeight;
+
+const maxX=wrap.clientWidth-btnW;
+const maxY=wrap.clientHeight-btnH;
+
+let x,y;
+
+do{
+x=Math.random()*maxX;
+y=Math.random()*maxY;
+}
+while(
+Math.abs(x-no.offsetLeft)<90 &&
+Math.abs(y-no.offsetTop)<60
+);
+
+no.style.left=x+"px";
+no.style.top=y+"px";
+}
+
+
+/* SUCCESS SCREEN */
+
+function accepted(){
+
+document.body.innerHTML=`
+
+<div style="
+min-height:100svh;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+background:#0f1115;
+color:white;
+font-family:Inter,sans-serif;
+text-align:center;
+padding:40px;
+animation:fade .5s;
+">
+
+<h1 style="font-size:52px;margin-bottom:20px;">
+You just made me the happiest person ❤️
+</h1>
+
+<p style="color:#aab1c3;font-size:22px;max-width:600px;">
+I promise to make this Valentine’s unforgettable.<br>
+Now I officially owe you a beautiful date.
+</p>
+
+</div>
+
+<style>
+@keyframes fade{
+from{opacity:0;transform:translateY(10px);}
+to{opacity:1;}
+}
+</style>
+
+`;
+}
+
+</script>
+
+</body>
+</html>
