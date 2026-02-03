@@ -14,7 +14,7 @@
 margin:0;
 padding:0;
 box-sizing:border-box;
--webkit-tap-highlight-color: transparent; /* removes ugly tap highlight */
+-webkit-tap-highlight-color: transparent;
 }
 
 body{
@@ -25,10 +25,10 @@ justify-content:center;
 font-family:'Inter',sans-serif;
 background:#0f1115;
 overflow:hidden;
-touch-action: manipulation; /* IMPORTANT mobile fix */
+touch-action: manipulation;
 }
 
-/* subtle romantic glow */
+/* romantic ambient glow */
 
 body::before{
 content:"";
@@ -73,7 +73,7 @@ position:relative;
 }
 
 
-/* TYPOGRAPHY */
+/* TEXT */
 
 h1{
 color:#e6e9ef;
@@ -91,11 +91,11 @@ line-height:1.6;
 }
 
 
-/* BUTTON AREA */
+/* BUTTON ZONE */
 
 .btn-wrap{
 position:relative;
-height:220px; /* slightly bigger for mobile escape */
+height:230px;
 }
 
 
@@ -131,10 +131,8 @@ transform:translateY(-2px);
 position:absolute;
 left:60%;
 top:40%;
-
 background:transparent;
 color:#c2c9d6;
-
 border:1px solid rgba(255,255,255,0.15);
 }
 
@@ -149,7 +147,7 @@ background:rgba(255,255,255,0.05);
 
 <div class="card">
 
-<h1>Will you be my Valentine PRAKHI? ❤️</h1>
+<h1>Will you be my Valentine, Prakhi? ❤️</h1>
 
 <p>
 Every day with you already feels special,<br>
@@ -173,7 +171,52 @@ const wrap = document.getElementById("wrap");
 let cooldown=false;
 
 
-/* DESKTOP ESCAPE */
+/* =============================
+   DIRECTIONAL ESCAPE ENGINE
+============================= */
+
+function escapeFrom(x,y){
+
+const rect=no.getBoundingClientRect();
+
+const btnW=no.offsetWidth;
+const btnH=no.offsetHeight;
+
+const btnCenterX=rect.left+btnW/2;
+const btnCenterY=rect.top+btnH/2;
+
+/* vector away from finger */
+let dx=btnCenterX-x;
+let dy=btnCenterY-y;
+
+const dist=Math.hypot(dx,dy);
+
+/* normalize */
+dx/=dist;
+dy/=dist;
+
+/* ULTRA MAGIC NUMBER */
+const ESCAPE_DISTANCE=180;
+
+let newLeft=no.offsetLeft + dx*ESCAPE_DISTANCE;
+let newTop=no.offsetTop + dy*ESCAPE_DISTANCE;
+
+
+/* EDGE PROTECTION */
+
+const maxX=wrap.clientWidth-btnW;
+const maxY=wrap.clientHeight-btnH;
+
+newLeft=Math.max(0,Math.min(maxX,newLeft));
+newTop=Math.max(0,Math.min(maxY,newTop));
+
+no.style.left=newLeft+"px";
+no.style.top=newTop+"px";
+
+}
+
+
+/* DESKTOP */
 
 document.addEventListener("mousemove",(e)=>{
 
@@ -187,20 +230,23 @@ e.clientX-(rect.left+rect.width/2),
 e.clientY-(rect.top+rect.height/2)
 );
 
-if(dist<150){
-move();
+if(dist<170){
+
+escapeFrom(e.clientX,e.clientY);
+
 cooldown=true;
-setTimeout(()=>cooldown=false,140);
+setTimeout(()=>cooldown=false,110);
 }
 
 });
 
 
-/* 🔥 ADVANCED MOBILE ESCAPE — DOES NOT BLOCK CLICKS */
+/* MOBILE — finger proximity */
 
 document.addEventListener("touchmove",(e)=>{
 
 const touch=e.touches[0];
+
 const rect=no.getBoundingClientRect();
 
 const dist=Math.hypot(
@@ -208,36 +254,11 @@ touch.clientX-(rect.left+rect.width/2),
 touch.clientY-(rect.top+rect.height/2)
 );
 
-if(dist<170){
-move();
+if(dist<200){
+escapeFrom(touch.clientX,touch.clientY);
 }
 
-},{passive:true}); // critical for performance + click safety
-
-
-
-function move(){
-
-const btnW=no.offsetWidth;
-const btnH=no.offsetHeight;
-
-const maxX=wrap.clientWidth-btnW;
-const maxY=wrap.clientHeight-btnH;
-
-let x,y;
-
-do{
-x=Math.random()*maxX;
-y=Math.random()*maxY;
-}
-while(
-Math.abs(x-no.offsetLeft)<130 &&
-Math.abs(y-no.offsetTop)<90
-);
-
-no.style.left=x+"px";
-no.style.top=y+"px";
-}
+},{passive:true});
 
 
 
