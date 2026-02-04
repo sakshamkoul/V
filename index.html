@@ -28,7 +28,7 @@ overflow:hidden;
 touch-action: manipulation;
 }
 
-/* romantic ambient glow */
+/* romantic glow */
 
 body::before{
 content:"";
@@ -91,7 +91,7 @@ line-height:1.6;
 }
 
 
-/* BUTTON ZONE */
+/* BUTTON AREA */
 
 .btn-wrap{
 position:relative;
@@ -172,48 +172,34 @@ let cooldown=false;
 
 
 /* =============================
-   DIRECTIONAL ESCAPE ENGINE
+   ULTRA FAST TELEPORT ENGINE
 ============================= */
 
-function escapeFrom(x,y){
+function teleport(){
 
-const rect=no.getBoundingClientRect();
+const btnW = no.offsetWidth;
+const btnH = no.offsetHeight;
 
-const btnW=no.offsetWidth;
-const btnH=no.offsetHeight;
+const maxX = wrap.clientWidth - btnW;
+const maxY = wrap.clientHeight - btnH;
 
-const btnCenterX=rect.left+btnW/2;
-const btnCenterY=rect.top+btnH/2;
+let newX, newY;
 
-/* vector away from finger */
-let dx=btnCenterX-x;
-let dy=btnCenterY-y;
+/* ensure BIG jump */
+do{
+    newX = Math.random() * maxX;
+    newY = Math.random() * maxY;
 
-const dist=Math.hypot(dx,dy);
+} while(
+    Math.abs(newX - no.offsetLeft) < 150 &&
+    Math.abs(newY - no.offsetTop) < 120
+);
 
-/* normalize */
-dx/=dist;
-dy/=dist;
-
-/* ULTRA MAGIC NUMBER */
-const ESCAPE_DISTANCE=180;
-
-let newLeft=no.offsetLeft + dx*ESCAPE_DISTANCE;
-let newTop=no.offsetTop + dy*ESCAPE_DISTANCE;
-
-
-/* EDGE PROTECTION */
-
-const maxX=wrap.clientWidth-btnW;
-const maxY=wrap.clientHeight-btnH;
-
-newLeft=Math.max(0,Math.min(maxX,newLeft));
-newTop=Math.max(0,Math.min(maxY,newTop));
-
-no.style.left=newLeft+"px";
-no.style.top=newTop+"px";
+no.style.left = newX + "px";
+no.style.top  = newY + "px";
 
 }
+
 
 
 /* DESKTOP */
@@ -223,40 +209,33 @@ document.addEventListener("mousemove",(e)=>{
 if(window.matchMedia("(pointer:coarse)").matches) return;
 if(cooldown) return;
 
-const rect=no.getBoundingClientRect();
+const rect = no.getBoundingClientRect();
 
-const dist=Math.hypot(
+const dist = Math.hypot(
 e.clientX-(rect.left+rect.width/2),
 e.clientY-(rect.top+rect.height/2)
 );
 
-if(dist<170){
+/* EARLY PANIC */
+if(dist < 240){
 
-escapeFrom(e.clientX,e.clientY);
+teleport();
 
 cooldown=true;
-setTimeout(()=>cooldown=false,110);
+setTimeout(()=>cooldown=false,35);
+
 }
 
 });
 
 
-/* MOBILE — finger proximity */
+/* MOBILE */
 
-document.addEventListener("touchmove",(e)=>{
+document.addEventListener("touchstart",()=>{
 
-const touch=e.touches[0];
+teleport();
 
-const rect=no.getBoundingClientRect();
-
-const dist=Math.hypot(
-touch.clientX-(rect.left+rect.width/2),
-touch.clientY-(rect.top+rect.height/2)
-);
-
-if(dist<200){
-escapeFrom(touch.clientX,touch.clientY);
-}
+/* no preventDefault -> YES remains clickable */
 
 },{passive:true});
 
