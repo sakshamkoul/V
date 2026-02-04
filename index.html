@@ -27,7 +27,7 @@ background:#0f1115;
 overflow:hidden;
 }
 
-/* glow */
+/* soft glow */
 
 body::before{
 content:"";
@@ -77,10 +77,14 @@ border:none;
 cursor:pointer;
 }
 
+/* YES */
+
 #yes{
 background:white;
 font-weight:600;
 }
+
+/* NO */
 
 #no{
 position:absolute;
@@ -118,71 +122,60 @@ So… will you be mine?
 const no = document.getElementById("no");
 const wrap = document.getElementById("wrap");
 
-/* =========================
-   TELEPORT
-========================= */
+/* TELEPORT FUNCTION */
 
 function teleport(){
 
-const btnW=no.offsetWidth;
-const btnH=no.offsetHeight;
+const btnW = no.offsetWidth;
+const btnH = no.offsetHeight;
 
-const maxX=wrap.clientWidth-btnW;
-const maxY=wrap.clientHeight-btnH;
+const maxX = wrap.clientWidth - btnW;
+const maxY = wrap.clientHeight - btnH;
 
 let x,y;
 
+/* ensure BIG jump */
 do{
-x=Math.random()*maxX;
-y=Math.random()*maxY;
+x = Math.random()*maxX;
+y = Math.random()*maxY;
 }
 while(
-Math.abs(x-no.offsetLeft)<160 &&
-Math.abs(y-no.offsetTop)<120
+Math.abs(x-no.offsetLeft)<150 &&
+Math.abs(y-no.offsetTop)<100
 );
 
-no.style.left=x+"px";
-no.style.top=y+"px";
-
+no.style.left = x+"px";
+no.style.top = y+"px";
 }
 
 
-/* =========================
-   POINTER MAGIC (THE FIX)
-========================= */
+/* =============================
+   DESKTOP — PERFECT HOVER
+============================= */
 
-/* move BEFORE click happens */
+no.addEventListener("mouseenter", teleport);
 
-no.addEventListener("pointerenter", teleport);
 
-/* if user somehow reaches click phase */
-no.addEventListener("pointerdown",(e)=>{
+/* backup protection */
+no.addEventListener("mousedown",(e)=>{
 e.preventDefault();
 teleport();
 });
 
 
-/* aggressive chase detection */
+/* =============================
+   MOBILE — TAP = RUN
+============================= */
 
-document.addEventListener("pointermove",(e)=>{
-
-const rect=no.getBoundingClientRect();
-
-const dist=Math.hypot(
-e.clientX-(rect.left+rect.width/2),
-e.clientY-(rect.top+rect.height/2)
-);
-
-if(dist<220){
+no.addEventListener("touchstart",(e)=>{
+e.preventDefault(); // stop click
 teleport();
-}
-
-});
+},{passive:false});
 
 
-/* =========================
-   SUCCESS SCREEN
-========================= */
+/* =============================
+   SUCCESS
+============================= */
 
 function accepted(){
 
