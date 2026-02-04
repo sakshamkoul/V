@@ -25,10 +25,9 @@ justify-content:center;
 font-family:'Inter',sans-serif;
 background:#0f1115;
 overflow:hidden;
-touch-action: manipulation;
 }
 
-/* romantic glow */
+/* glow */
 
 body::before{
 content:"";
@@ -40,46 +39,22 @@ top:-250px;
 right:-250px;
 }
 
-body::after{
-content:"";
-position:absolute;
-width:600px;
-height:600px;
-background:radial-gradient(circle, rgba(120,160,255,0.08), transparent 60%);
-bottom:-250px;
-left:-250px;
-}
-
-
-/* CARD */
+/* card */
 
 .card{
 width:min(820px,92vw);
 padding:70px 55px;
 border-radius:26px;
-
 background:rgba(255,255,255,0.04);
 backdrop-filter:blur(18px);
--webkit-backdrop-filter:blur(18px);
-
 border:1px solid rgba(255,120,140,0.18);
-
-box-shadow:
-0 10px 40px rgba(0,0,0,0.6),
-inset 0 1px rgba(255,255,255,0.05);
-
+box-shadow:0 10px 40px rgba(0,0,0,0.6);
 text-align:center;
-position:relative;
 }
-
-
-/* TEXT */
 
 h1{
 color:#e6e9ef;
 font-size:clamp(30px,4vw,46px);
-font-weight:600;
-letter-spacing:-0.4px;
 margin-bottom:14px;
 }
 
@@ -87,19 +62,12 @@ p{
 color:#aab1c3;
 font-size:clamp(16px,2vw,20px);
 margin-bottom:45px;
-line-height:1.6;
 }
-
-
-/* BUTTON AREA */
 
 .btn-wrap{
 position:relative;
-height:230px;
+height:240px;
 }
-
-
-/* BUTTONS */
 
 button{
 padding:14px 30px;
@@ -107,25 +75,12 @@ font-size:17px;
 border-radius:12px;
 border:none;
 cursor:pointer;
-transition:.25s ease;
 }
-
-
-/* YES */
 
 #yes{
-background:#ffffff;
-color:#111;
+background:white;
 font-weight:600;
-box-shadow:0 6px 20px rgba(255,255,255,0.15);
 }
-
-#yes:hover{
-transform:translateY(-2px);
-}
-
-
-/* NO */
 
 #no{
 position:absolute;
@@ -133,11 +88,7 @@ left:60%;
 top:40%;
 background:transparent;
 color:#c2c9d6;
-border:1px solid rgba(255,255,255,0.15);
-}
-
-#no:hover{
-background:rgba(255,255,255,0.05);
+border:1px solid rgba(255,255,255,0.2);
 }
 
 </style>
@@ -152,7 +103,6 @@ background:rgba(255,255,255,0.05);
 <p>
 Every day with you already feels special,<br>
 but I was hoping to make this Valentine’s ours.<br><br>
-
 So… will you be mine?
 </p>
 
@@ -168,80 +118,71 @@ So… will you be mine?
 const no = document.getElementById("no");
 const wrap = document.getElementById("wrap");
 
-let cooldown=false;
-
-
-/* =============================
-   ULTRA FAST TELEPORT ENGINE
-============================= */
+/* =========================
+   TELEPORT
+========================= */
 
 function teleport(){
 
-const btnW = no.offsetWidth;
-const btnH = no.offsetHeight;
+const btnW=no.offsetWidth;
+const btnH=no.offsetHeight;
 
-const maxX = wrap.clientWidth - btnW;
-const maxY = wrap.clientHeight - btnH;
+const maxX=wrap.clientWidth-btnW;
+const maxY=wrap.clientHeight-btnH;
 
-let newX, newY;
+let x,y;
 
-/* ensure BIG jump */
 do{
-    newX = Math.random() * maxX;
-    newY = Math.random() * maxY;
-
-} while(
-    Math.abs(newX - no.offsetLeft) < 150 &&
-    Math.abs(newY - no.offsetTop) < 120
+x=Math.random()*maxX;
+y=Math.random()*maxY;
+}
+while(
+Math.abs(x-no.offsetLeft)<160 &&
+Math.abs(y-no.offsetTop)<120
 );
 
-no.style.left = newX + "px";
-no.style.top  = newY + "px";
+no.style.left=x+"px";
+no.style.top=y+"px";
 
 }
 
 
+/* =========================
+   POINTER MAGIC (THE FIX)
+========================= */
 
-/* DESKTOP */
+/* move BEFORE click happens */
 
-document.addEventListener("mousemove",(e)=>{
+no.addEventListener("pointerenter", teleport);
 
-if(window.matchMedia("(pointer:coarse)").matches) return;
-if(cooldown) return;
+/* if user somehow reaches click phase */
+no.addEventListener("pointerdown",(e)=>{
+e.preventDefault();
+teleport();
+});
 
-const rect = no.getBoundingClientRect();
 
-const dist = Math.hypot(
+/* aggressive chase detection */
+
+document.addEventListener("pointermove",(e)=>{
+
+const rect=no.getBoundingClientRect();
+
+const dist=Math.hypot(
 e.clientX-(rect.left+rect.width/2),
 e.clientY-(rect.top+rect.height/2)
 );
 
-/* EARLY PANIC */
-if(dist < 240){
-
+if(dist<220){
 teleport();
-
-cooldown=true;
-setTimeout(()=>cooldown=false,35);
-
 }
 
 });
 
 
-/* MOBILE */
-
-document.addEventListener("touchstart",()=>{
-
-teleport();
-
-/* no preventDefault -> YES remains clickable */
-
-},{passive:true});
-
-
-
-/* SUCCESS SCREEN */
+/* =========================
+   SUCCESS SCREEN
+========================= */
 
 function accepted(){
 
@@ -255,31 +196,21 @@ align-items:center;
 justify-content:center;
 background:#0f1115;
 color:white;
-font-family:Inter,sans-serif;
+font-family:Inter;
 text-align:center;
-padding:40px;
-animation:fade .5s;
 ">
 
-<h1 style="font-size:52px;margin-bottom:20px;">
+<h1 style="font-size:52px;">
 You just made me the happiest person ❤️
 </h1>
 
-<p style="color:#aab1c3;font-size:22px;max-width:600px;">
-I promise to make this Valentine’s unforgettable.<br>
-Now I officially owe you a beautiful date 🙂
+<p style="color:#aab1c3;font-size:22px;">
+I promise to make this Valentine’s unforgettable 🙂
 </p>
 
 </div>
-
-<style>
-@keyframes fade{
-from{opacity:0;transform:translateY(10px);}
-to{opacity:1;}
-}
-</style>
-
 `;
+
 }
 
 </script>
